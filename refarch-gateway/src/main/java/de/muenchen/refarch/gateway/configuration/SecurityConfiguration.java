@@ -56,7 +56,6 @@ public class SecurityConfiguration {
                     // permitAll
                     authorizeExchangeSpec.pathMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                             .pathMatchers("/api/*/info",
-                                    "/api/backend-service/settings",
                                     "/actuator/health",
                                     "/actuator/health/liveness",
                                     "/actuator/health/readiness",
