@@ -1,5 +1,6 @@
 package de.muenchen.refarch.gateway.configuration;
 
+import de.muenchen.refarch.gateway.service.SsoStatusService;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 public class SecurityConfiguration {
 
     private final CsrfProtectionMatcher csrfProtectionMatcher;
+    private final SsoStatusService ssoStatusService;
 
     /**
      * Same lifetime as SSO Session (e.g. 10 hours).
@@ -62,8 +64,8 @@ public class SecurityConfiguration {
                             .permitAll()
                             .pathMatchers(HttpMethod.OPTIONS, "/public/**").permitAll()
                             .pathMatchers(HttpMethod.GET, "/public/**").permitAll()
-                            // only authenticated
-                            .anyExchange().authenticated();
+                            // Dynamic authentication based on SSO status
+                            .anyExchange().access(new SsoAccessEvaluator(ssoStatusService));
                 })
                 .cors(corsSpec -> {
                 })
