@@ -20,8 +20,10 @@ class SecurityConfigurationTest {
 
     @Test
     void accessSecuredResourceRootThenUnauthorized() {
-        // 302 is returned instead of 401 because auf cookie session
-        api.get().uri("/").exchange().expectStatus().isFound();
+        // When SSO is enabled and user is not authenticated, we expect a 401
+        api.get().uri("/").exchange()
+                .expectStatus().isUnauthorized()
+                .expectHeader().value("Location", value -> value.contains("/oauth2/authorization/sso"));
     }
 
     @Test
