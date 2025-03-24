@@ -83,6 +83,9 @@ public class SecurityConfiguration {
                     csrfSpec.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse());
                     csrfSpec.requireCsrfProtectionMatcher(csrfProtectionMatcher);
                 })
+                // Enable OAuth2 client first
+                .oauth2Client(Customizer.withDefaults())
+                // Then configure OAuth2 login
                 .oauth2Login(oAuth2LoginSpec -> {
                     oAuth2LoginSpec.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler() {
                         @Override
