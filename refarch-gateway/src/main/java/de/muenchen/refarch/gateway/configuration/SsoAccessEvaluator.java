@@ -20,7 +20,9 @@ public class SsoAccessEvaluator implements ReactiveAuthorizationManager<Authoriz
                     if (!ssoEnabled) {
                         return Mono.just(new AuthorizationDecision(true));
                     }
-                    return authentication.map(auth -> new AuthorizationDecision(auth.isAuthenticated()));
+                    return authentication
+                            .map(auth -> new AuthorizationDecision(auth.isAuthenticated()))
+                            .defaultIfEmpty(new AuthorizationDecision(false));
                 });
     }
 }

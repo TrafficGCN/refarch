@@ -60,8 +60,7 @@ public class SecurityConfiguration {
                                     "/actuator/health/liveness",
                                     "/actuator/health/readiness",
                                     "/actuator/info",
-                                    "/actuator/metrics",
-                                    "/api/settings")
+                                    "/actuator/metrics")
                             .permitAll()
                             .pathMatchers(HttpMethod.OPTIONS, "/public/**").permitAll()
                             .pathMatchers(HttpMethod.GET, "/public/**").permitAll()
@@ -84,14 +83,18 @@ public class SecurityConfiguration {
                     csrfSpec.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse());
                     csrfSpec.requireCsrfProtectionMatcher(csrfProtectionMatcher);
                 })
-                .oauth2Login(oAuth2LoginSpec -> oAuth2LoginSpec.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler() {
-                    @Override
-                    public Mono<Void> onAuthenticationSuccess(final WebFilterExchange webFilterExchange, final Authentication authentication) {
-                        webFilterExchange.getExchange().getSession().subscribe(
-                                webSession -> webSession.setMaxIdleTime(Duration.ofSeconds(springSessionTimeoutSeconds)));
-                        return super.onAuthenticationSuccess(webFilterExchange, authentication);
-                    }
-                }));
+                .oauth2Login(oAuth2LoginSpec -> {
+                    oAuth2LoginSpec.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler() {
+                        @Override
+                        public Mono<Void> onAuthenticationSuccess(final WebFilterExchange webFilterExchange, final Authentication authentication) {
+                            webFilterExchange.getExchange().getSession().subscribe(
+                                    webSession -> webSession.setMaxIdleTime(Duration.ofSeconds(springSessionTimeoutSeconds)));
+                            return super.onAuthenticationSuccess(webFilterExchange, authentication);
+                        }
+                    });
+                    // Configure the login page
+                    oAuth2LoginSpec.loginPage("/oauth2/authorization/sso");
+                });
 
         return http.build();
     }
