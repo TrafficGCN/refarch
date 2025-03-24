@@ -1,5 +1,7 @@
 package de.muenchen.refarch.gateway.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,22 +28,16 @@ public class SsoStatusService {
                 .uri(url)
                 .retrieve()
                 .bodyToMono(SettingsResponse.class)
-                .map(SettingsResponse::isSsoEnabled)
+                .map(SettingsResponse::isSsoAuthEnabled)
                 .onErrorResume(e -> {
                     log.error("Failed to fetch SSO status from backend", e);
                     return Mono.just(true); // Default to SSO enabled on error
                 });
     }
 
+    @Data
     private static final class SettingsResponse {
-        private boolean ssoEnabled;
-
-        public boolean isSsoEnabled() {
-            return ssoEnabled;
-        }
-
-        public void setSsoEnabled(final boolean ssoEnabled) {
-            this.ssoEnabled = ssoEnabled;
-        }
+        @JsonProperty("ssoAuthEnabled")
+        private boolean ssoAuthEnabled;
     }
 }
