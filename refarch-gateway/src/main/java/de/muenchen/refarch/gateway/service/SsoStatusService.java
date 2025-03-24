@@ -22,7 +22,7 @@ public class SsoStatusService {
                 .baseUrl(gatewayBaseUrl)
                 .build()
                 .get()
-                .uri("/settings")
+                .uri("/api/settings")
                 .retrieve()
                 .bodyToMono(SettingsResponse.class)
                 .map(SettingsResponse::isSsoEnabled)

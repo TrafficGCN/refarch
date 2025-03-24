@@ -60,7 +60,8 @@ public class SecurityConfiguration {
                                     "/actuator/health/liveness",
                                     "/actuator/health/readiness",
                                     "/actuator/info",
-                                    "/actuator/metrics")
+                                    "/actuator/metrics",
+                                    "/api/settings")
                             .permitAll()
                             .pathMatchers(HttpMethod.OPTIONS, "/public/**").permitAll()
                             .pathMatchers(HttpMethod.GET, "/public/**").permitAll()
