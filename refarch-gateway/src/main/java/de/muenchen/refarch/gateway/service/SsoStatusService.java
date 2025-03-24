@@ -20,7 +20,7 @@ public class SsoStatusService {
     private String backendUrl;
 
     public Mono<Boolean> getSsoStatus() {
-        final String url = backendUrl + "api/settings";
+        final String url = backendUrl + "settings";
         log.info("Fetching SSO status directly from backend: {}", url);
         return webClientBuilder
                 .build()
