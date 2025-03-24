@@ -2,7 +2,9 @@ package de.muenchen.refarch.gateway.configuration;
 
 import de.muenchen.refarch.gateway.service.SsoStatusService;
 import java.time.Duration;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,7 @@ import reactor.core.publisher.Mono;
 @Configuration
 @Profile("!no-security")
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfiguration {
 
     private final CsrfProtectionMatcher csrfProtectionMatcher;
@@ -90,6 +93,7 @@ public class SecurityConfiguration {
                     oAuth2LoginSpec.authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler() {
                         @Override
                         public Mono<Void> onAuthenticationSuccess(final WebFilterExchange webFilterExchange, final Authentication authentication) {
+                            log.info("Authentication successful, setting session timeout");
                             webFilterExchange.getExchange().getSession().subscribe(
                                     webSession -> webSession.setMaxIdleTime(Duration.ofSeconds(springSessionTimeoutSeconds)));
                             return super.onAuthenticationSuccess(webFilterExchange, authentication);
@@ -97,6 +101,15 @@ public class SecurityConfiguration {
                     });
                     // Configure the login page
                     oAuth2LoginSpec.loginPage("/oauth2/authorization/sso");
+                })
+                // Configure exception handling to redirect to login
+                .exceptionHandling(exceptionHandlingSpec -> {
+                    exceptionHandlingSpec.authenticationEntryPoint((exchange, ex) -> {
+                        log.info("Authentication entry point called for path: {}", exchange.getRequest().getPath());
+                        log.info("Redirecting to: /oauth2/authorization/sso");
+                        exchange.getResponse().getHeaders().setLocation(URI.create("/oauth2/authorization/sso"));
+                        return exchange.getResponse().setComplete();
+                    });
                 });
 
         return http.build();
