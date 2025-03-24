@@ -107,8 +107,8 @@ public class SecurityConfiguration {
                     exceptionHandlingSpec.authenticationEntryPoint((exchange, ex) -> {
                         log.info("Authentication entry point called for path: {}", exchange.getRequest().getPath());
                         log.info("Redirecting to: /oauth2/authorization/sso");
+                        exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.FOUND);
                         exchange.getResponse().getHeaders().setLocation(URI.create("/oauth2/authorization/sso"));
-                        exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
                         return exchange.getResponse().setComplete();
                     });
                 });

@@ -20,9 +20,9 @@ class SecurityConfigurationTest {
 
     @Test
     void accessSecuredResourceRootThenUnauthorized() {
-        // When SSO is enabled and user is not authenticated, we expect a 401
+        // When SSO is enabled and user is not authenticated, we expect a redirect to login
         api.get().uri("/").exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isFound()
                 .expectHeader().value("Location", value -> value.contains("/oauth2/authorization/sso"));
     }
 
