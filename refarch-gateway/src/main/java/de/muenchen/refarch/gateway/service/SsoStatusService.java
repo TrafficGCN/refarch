@@ -15,14 +15,15 @@ public class SsoStatusService {
     private final WebClient.Builder webClientBuilder;
 
     @Value("${spring.cloud.gateway.routes[1].uri:http://localhost:39146}")
-    private String gatewayBaseUrl;
+    private String backendUrl;
 
     public Mono<Boolean> getSsoStatus() {
+        final String url = backendUrl + "/api/settings";
+        log.info("Fetching SSO status directly from backend: {}", url);
         return webClientBuilder
-                .baseUrl(gatewayBaseUrl)
                 .build()
                 .get()
-                .uri("/api/settings")
+                .uri(url)
                 .retrieve()
                 .bodyToMono(SettingsResponse.class)
                 .map(SettingsResponse::isSsoEnabled)
